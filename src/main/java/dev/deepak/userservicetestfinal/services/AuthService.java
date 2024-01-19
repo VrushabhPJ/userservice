@@ -47,6 +47,12 @@ public class AuthService {
             //throw an exception
             throw new RuntimeException("Wrong password entered");
         }
+//     ** Implementing limit on number of active sessions for a user.
+//        else {
+//            Optional<Session> sessionOptional = sessionRepository.countByUser(user);
+//            if (sessionOptional.get().getToken().length() < 2) {
+//            }
+//        }
 
         //Generating the token
         //String token = RandomStringUtils.randomAlphanumeric(30);
