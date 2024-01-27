@@ -7,6 +7,8 @@ import dev.deepak.userservicetestfinal.models.User;
 import dev.deepak.userservicetestfinal.models.Session;
 import dev.deepak.userservicetestfinal.repositories.SessionRepository;
 import dev.deepak.userservicetestfinal.repositories.UserRepository;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.MacAlgorithm;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -139,6 +141,27 @@ public class AuthService {
         if (sessionOptional.isEmpty()) {
             return null;
         }
+        Session session= sessionOptional.get();
+        if(!session.getSessionStatus().equals(SessionStatus.ACTIVE)) {
+            return SessionStatus.ENDED;
+        }
+
+        Date currentDate= new Date();
+        if(session.getExpiringAt().before(currentDate)) {
+            return SessionStatus.ENDED;
+        }
+
+        //decoding jwt
+        Jws<Claims> jwsClaims= Jwts.parser().build().parseSignedClaims(token);
+        //claims is map DS
+
+        String email= (String) jwsClaims.getPayload().get("email");
+        List<Role> roles = (List<Role>) jwsClaims.getPayload().get("roles");
+        Date createdAt = (Date) jwsClaims.getPayload().get("createdAt");
+
+//        if (restrictedEmails.contains(email)) {
+//            //reject the token
+//        }
 
         return SessionStatus.ACTIVE;
     }
